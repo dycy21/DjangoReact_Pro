@@ -1,0 +1,10 @@
+django
+djangorestframework
+django-cors-headers
+djangorestframework-simplejwt
+django-filter
+psycopg2-binary         # PostgreSQL database adapter fro posttgreSQL
+gunicorn                # WSGI HTTP server for  production server
+python-dotenv           # To manage environment variables
+django-database-url     # To parse database URLs
+django-cloudinary-storage  # Cloudinary storage backend for Django
