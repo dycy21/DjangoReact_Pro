@@ -2,9 +2,9 @@ services:
   # --- 1. PostgreSQL Database ---
   - type: pserv
     name: real-estate-db
-    databaseName: real_estate_db # You can name this anything
-    plan: free # Change to 'starter' for a paid plan
-    postgresMajorVersion: 14
+    databaseName: real_estate_db 
+    plan: free 
+    postgresMajorVersion: "14"
     ipAllowList: [] # Allows access from anywhere (needed for the web service)
 
   # --- 2. Django API Service ---
