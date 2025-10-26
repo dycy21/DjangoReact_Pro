@@ -16,7 +16,7 @@ services:
     rootDir: ./RealEstate
     buildFilter:
       paths:
-      - RealEstate/**
+        - RealEstate/**
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate
@@ -44,5 +44,7 @@ services:
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+
+
 
 
