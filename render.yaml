@@ -2,21 +2,21 @@ services:
   # --- 1. PostgreSQL Database ---
   - type: pserv
     name: real-estate-db
-    databaseName: real_estate_db 
-    plan: free 
+    databaseName: real_estate_db
+    plan: free
     postgresMajorVersion: "14"
-    ipAllowList: [] # Allows access from anywhere (needed for the web service)
+    ipAllowList: [] # Allows access from anywhere
 
   # --- 2. Django API Service ---
   - type: web
     name: real-estate-api
     env: python
-    plan: free # Change to 'starter' for a paid plan
+    plan: free
     # Tell Render to look inside your backend folder
     rootDir: ./RealEstata
     buildFilter:
       paths:
-      - RealEstata/** # Only rebuild if backend code changes
+      - RealEstata/**
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate
@@ -28,15 +28,14 @@ services:
           type: pserv
           name: real-estate-db # Must match the DB name above
           property: connectionString
-
+      
       # --- Standard Django Settings ---
       - key: DEBUG
         value: false
       - key: SECRET_KEY
         generateValue: true # Render will create a secure key
-
+      
       # --- Environment variables we will set manually ---
-      # We will fill these in the Render Dashboard
       - key: CORS_ALLOWED_ORIGINS
         value: "http://localhost:5173" # Placeholder
       - key: CLOUDINARY_CLOUD_NAME
