@@ -4,19 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Real Estate App</title>
+    <title>React Real Estate</title>
   </head>
-  <body>
-    <!-- 
-      This is the root element where your entire React application 
-      will be "mounted" or attached by the main.jsx script.
-    -->
+  <body class="bg-gray-100">
     <div id="root"></div>
-    
     <!-- 
-      This script tag tells Vite to load your main.jsx file.
-      Vite bundles all your React code and serves it from here.
+      This path is now relative, which allows Vite/Rollup
+      to find it correctly during the build process.
     -->
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="./src/main.jsx"></script>
   </body>
 </html>
+
