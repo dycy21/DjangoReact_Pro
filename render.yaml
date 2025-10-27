@@ -15,17 +15,32 @@ services:
     name: real-estate-api
     env: python
     plan: free
-    # Tell Render to look inside your backend folder
+    
+    # --- Check this path ---
+    # This must be the correct path from your repo root to your backend
     rootDir: ./RealEstate
+    
+    # This filter ensures Render only rebuilds when backend code changes
     buildFilter:
       paths:
         - RealEstate/**
+    
+    # --- Check your requirements.txt ---
+    # Render will run this command. Make sure all packages are in requirements.txt
+    # (django, gunicorn, djangorestframework, dj-database-url, 
+    #  psycopg2-binary, django-cloudinary-storage, django-cors-headers)
     buildCommand: |
       pip install -r requirements.txt
       python manage.py migrate
+    
+    # --- Check this path ---
+    # This command starts your server. 
+    # It must match your project's structure.
+    # It looks for a file named 'wsgi.py' inside a folder named 'backend_core'
     startCommand: gunicorn backend_core.wsgi
+    
     envVars:
-      # --- Tell Django to use the database we just created ---
+      # --- Tells Django to use the database we just created ---
       - key: DATABASE_URL
         fromService:
           type: pserv 
@@ -38,13 +53,13 @@ services:
       - key: SECRET_KEY
         generateValue: true # Render will create a secure key
       
-      # --- Environment variables we will set manually ---
+      # --- Environment variables you MUST set in Render dashboard ---
       - key: CORS_ALLOWED_ORIGINS
-        value: "http://localhost:5173" # Placeholder
+        value: "http://localhost:5173" # Set this in Render UI to your Vercel URL
       - key: CLOUDINARY_CLOUD_NAME
-        sync: false
+        sync: false # Set this value in Render UI
       - key: CLOUDINARY_API_KEY
-        sync: false
+        sync: false # Set this value in Render UI
       - key: CLOUDINARY_API_SECRET
-        sync: false
+        sync: false # Set this value in Render UI
 
