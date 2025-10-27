@@ -1,16 +1,15 @@
 # This file tells Render how to build your services.
-# Format is now:
-# 1. A top-level 'databases' block
-# 2. A top-level 'services' block
+# Both the database and web service are listed under 'services:'.
 
-databases:
+services:
   # --- 1. PostgreSQL Database ---
-  - name: real-estate-db
+  - type: pserv
+    name: real-estate-db
     databaseName: real_estate_db
     plan: free
     postgresMajorVersion: "14"
+    ipAllowList: [] # Allows access from anywhere
 
-services:
   # --- 2. Django API Service ---
   - type: web
     name: real-estate-api
@@ -29,7 +28,7 @@ services:
       # --- Tell Django to use the database we just created ---
       - key: DATABASE_URL
         fromService:
-          type: pserv # Changed from 'postgres'
+          type: pserv 
           name: real-estate-db # Must match the database name above
           property: connectionString
       
