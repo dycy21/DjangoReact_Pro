@@ -1,24 +1,20 @@
-from rest_framework import serializers
 from .models import CustomUser
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import serializers
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    Custom serializer for TokenObtainPairView to use 'email' instead of 'username'.
-    """
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # Add custom claims here if needed
+        # Add custom claims
         token['username'] = user.username
         token['email'] = user.email
         return token
 
     def validate(self, attrs):
-        # Use email as the username field for validation
+        # The default implementation uses 'username', we change it to 'email'
         attrs[self.username_field] = attrs.get('email')
-        data = super().validate(attrs)
-        return data
+        return super().validate(attrs)
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
@@ -27,10 +23,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ('username', 'email', 'password', 'password2')
+        extra_kwargs = {
+            'username': {'required': True}
+        }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Passwords must match."})
+        
+        if CustomUser.objects.filter(email=attrs['email']).exists():
+             raise serializers.ValidationError({"email": "A user with this email already exists."})
+
         return attrs
 
     def create(self, validated_data):
@@ -40,8 +43,4 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-
-
-
-    
 

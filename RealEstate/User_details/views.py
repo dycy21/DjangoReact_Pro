@@ -1,6 +1,6 @@
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
-# Import the new serializer
+# Import the new serializers from your serializers.py file
 from .serializers import UserRegistrationSerializer, CustomTokenObtainPairSerializer
 from .models import CustomUser
 from rest_framework_simplejwt.views import TokenObtainPairView
