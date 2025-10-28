@@ -5,11 +5,11 @@ import os
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly # <-- Import IsAuthenticatedOrReadOnly
 from .models import Property
 from .serializers import PropertySerializer
-from .permissions import IsOwnerOrReadOnly
-from .filters import PropertyFilter
+from .permissions import IsOwnerOrReadOnly # <-- This will be unused
+from .filters import PropertyFilter # <-- This will be unused
 from django.db.models import Q # Make sure this import is present
 
 class PropertyViewSet(viewsets.ModelViewSet):
@@ -21,18 +21,18 @@ class PropertyViewSet(viewsets.ModelViewSet):
     """
     
     serializer_class = PropertySerializer
-    permission_classes = [IsOwnerOrReadOnly]
-    filterset_class = PropertyFilter
     
-    # Allows for simple search like /?search=downtown
-    search_fields = ['address', 'city', 'state', 'description']
-
     # --- FIX ---
-    # The previous get_queryset method was causing a 500 error.
-    # Let's simplify the logic. We will define the base queryset
-    # for all requests here.
-    # This will return ONLY active properties for everyone (anonymous or logged in).
-    # The filter backend will apply search filters on top of this.
+    # The view is still crashing with a 500 error.
+    # Let's simplify it as much as possible to find the error.
+    # I am temporarily removing permissions, filters, and search fields.
+    
+    permission_classes = [IsAuthenticatedOrReadOnly] # Use the simple, built-in permission
+    # filterset_class = PropertyFilter  # <-- Temporarily removed
+    # search_fields = ['address', 'city', 'state', 'description'] # <-- Temporarily removed
+
+    # This simplified queryset will run.
+    # If this works, the error is likely in your PropertyFilter class.
     queryset = Property.objects.filter(status='active').prefetch_related('images').order_by('-created_at')
     # --- END FIX ---
     
@@ -98,5 +98,4 @@ class GenerateCloudinarySignatureView(APIView):
             'cloud_name': cloud_name,
             'folder': folder
         })
-
 
