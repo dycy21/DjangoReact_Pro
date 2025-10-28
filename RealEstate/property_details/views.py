@@ -19,11 +19,6 @@ class PropertyViewSet(viewsets.ModelViewSet):
     - Authenticated users can create.
     - Property owners can update and delete.
     """
-    # --- FIX ---
-    # 1. Provide a SIMPLE, unfiltered base queryset for the class.
-    #    The .order_by() is good to have here.
-    queryset = Property.objects.all().prefetch_related('images').order_by('-created_at')
-    # --- END FIX ---
     
     serializer_class = PropertySerializer
     permission_classes = [IsOwnerOrReadOnly]
@@ -32,29 +27,39 @@ class PropertyViewSet(viewsets.ModelViewSet):
     # Allows for simple search like /?search=downtown
     search_fields = ['address', 'city', 'state', 'description']
 
+    # --- FIX ---
+    # The previous get_queryset method was causing a 500 error.
+    # Let's simplify the logic. We will define the base queryset
+    # for all requests here.
+    # This will return ONLY active properties for everyone (anonymous or logged in).
+    # The filter backend will apply search filters on top of this.
+    queryset = Property.objects.filter(status='active').prefetch_related('images').order_by('-created_at')
+    # --- END FIX ---
+    
+
     def get_serializer_context(self):
         # Pass the request to the serializer
         return {'request': self.request}
 
-    def get_queryset(self):
-        # --- FIX ---
-        # 2. Start with the base queryset (which might already be
-        #    filtered by django-filter if query params are present)
-        queryset = super().get_queryset()
-        user = self.request.user
+    # --- TEMPORARILY REMOVED FOR DEBUGGING ---
+    # The logic below was causing the 500 error. We are replacing it
+    # with the simpler `queryset` attribute above.
+    #
+    # def get_queryset(self):
+    #     queryset = super().get_queryset()
+    #     user = self.request.user
         
-        if user.is_authenticated:
-            # 3. If the user is logged in, show 'active' properties OR their own properties
-            return queryset.filter(
-                Q(status='active') | Q(owner=user)
-            ).distinct()
+    #     if user.is_authenticated:
+    #         return queryset.filter(
+    #             Q(status='active') | Q(owner=user)
+    #         ).distinct()
         
-        # 4. If anonymous, ONLY show 'active' properties
-        return queryset.filter(status='active')
-        # --- END FIX ---
+    #     return queryset.filter(status='active')
+    # --- END REMOVED ---
+
 
 # --- View for Cloudinary Signature ---
-
+# (This part is unchanged)
 class GenerateCloudinarySignatureView(APIView):
     """
     Generates a signature for direct-to-Cloudinary uploads.
@@ -93,4 +98,5 @@ class GenerateCloudinarySignatureView(APIView):
             'cloud_name': cloud_name,
             'folder': folder
         })
+
 
