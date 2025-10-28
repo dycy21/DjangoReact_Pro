@@ -8,9 +8,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Property
 # from .serializers import PropertySerializer # <--- Temporarily bypass this file
-from .permissions import IsOwnerOrReadOnly
-from .filters import PropertyFilter
-from django.db.models import Q
+# from .permissions import IsOwnerOrReadOnly # <--- FIX: Temporarily comment out
+# from .filters import PropertyFilter # <--- FIX: Temporarily comment out
+# from django.db.models import Q # <--- FIX: Temporarily comment out
 
 # --- FIX: TEMPORARY SERIALIZER ---
 # We are creating a very simple serializer here to bypass the
@@ -86,5 +86,4 @@ class GenerateCloudinarySignatureView(APIView):
             'cloud_name': cloud_name,
             'folder': folder
         })
-
 
