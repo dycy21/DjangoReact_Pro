@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-# We are now re-importing the upload view
+# We are now re-importing both views
 from .views import PropertyViewSet, GenerateCloudinarySignatureView
 
 # Create a router and register our viewset with it.
