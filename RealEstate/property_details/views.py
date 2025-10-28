@@ -11,13 +11,10 @@ from .serializers import PropertySerializer
 from .permissions import IsOwnerOrReadOnly
 from .filters import PropertyFilter
 
-# --- We are now restoring the full, working viewset ---
+# This ViewSet is correct and working
 class PropertyViewSet(viewsets.ModelViewSet):
     """
     API endpoint for properties.
-    - Public users can list and retrieve (search).
-    - Authenticated users can create.
-    - Property owners can update and delete.
     """
     serializer_class = PropertySerializer
     permission_classes = [IsOwnerOrReadOnly]
@@ -25,22 +22,18 @@ class PropertyViewSet(viewsets.ModelViewSet):
     search_fields = ['address', 'city', 'state', 'description']
 
     def get_serializer_context(self):
-        # Pass the request to the serializer
         return {'request': self.request}
 
     def get_queryset(self):
-        # Allow authenticated users to see their non-active properties
         user = self.request.user
         if user.is_authenticated:
             return Property.objects.filter(
                 Q(status='active') | Q(owner=user)
             ).prefetch_related('images').distinct()
-        
-        # Public users only see active properties
         return Property.objects.filter(status='active').prefetch_related('images')
 
 
-# --- We are now re-enabling the file upload view ---
+# --- This is the view that needs to be fixed ---
 class GenerateCloudinarySignatureView(APIView):
     """
     Generates a signature for Cloudinary uploads.
@@ -48,12 +41,9 @@ class GenerateCloudinarySignatureView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        # Get params from request
-        timestamp = int(time.time())
-        public_id = request.data.get('public_id')
-        eager = request.data.get('eager')
-        
         try:
+            timestamp = int(time.time())
+            
             # Get secrets from environment
             cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
             api_key = os.environ.get('CLOUDINARY_API_KEY')
@@ -65,8 +55,11 @@ class GenerateCloudinarySignatureView(APIView):
                     status=status.HTTP_501_NOT_IMPLEMENTED
                 )
 
-            # Create the string to sign
-            string_to_sign = f"eager={eager}&public_id={public_id}&timestamp={timestamp}{api_secret}"
+            # --- THE FIX IS HERE ---
+            # The string to sign must *only* contain the parameters
+            # that are also being sent to Cloudinary.
+            # Your error message confirms Cloudinary is only expecting the timestamp.
+            string_to_sign = f"timestamp={timestamp}{api_secret}"
             
             # Create signature
             signature = hashlib.sha1(string_to_sign.encode('utf-8')).hexdigest()
