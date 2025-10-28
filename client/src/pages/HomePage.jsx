@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// Use relative paths for component imports
-import apiClient from '../api/apiClient.js';
-import PropertyCard from '../components/PropertyCard.jsx';
-import PropertyFilter from '../components/PropertyFilter.jsx';
-import Spinner from '../components/Spinner.jsx';
-import ErrorMessage from '../components/ErrorMessage.jsx';
+// Use absolute paths from the /src root
+import apiClient from '/src/api/apiClient.js';
+import PropertyCard from '/src/components/PropertyCard.jsx';
+import PropertyFilter from '/src/components/PropertyFilter.jsx';
+import Spinner from '/src/components/Spinner.jsx';
+import ErrorMessage from '/src/components/ErrorMessage.jsx';
 
 function HomePage() {
   const [properties, setProperties] = useState([]);
@@ -54,9 +54,12 @@ function HomePage() {
       {!loading && !error && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {properties.length > 0 ? (
-            properties.map(property => (
+            // --- FIX ---
+            // Filter out any null or undefined items in the array before mapping
+            properties.filter(Boolean).map(property => (
               <PropertyCard key={property.id} property={property} />
             ))
+            // --- END FIX ---
           ) : (
             <p className="col-span-full text-center text-gray-500">No properties found.</p>
           )}
