@@ -1,5 +1,24 @@
 from rest_framework import serializers
 from .models import CustomUser
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """
+    Custom serializer for TokenObtainPairView to use 'email' instead of 'username'.
+    """
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims here if needed
+        token['username'] = user.username
+        token['email'] = user.email
+        return token
+
+    def validate(self, attrs):
+        # Use email as the username field for validation
+        attrs[self.username_field] = attrs.get('email')
+        data = super().validate(attrs)
+        return data
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
@@ -21,3 +40,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+
+
+    
+
