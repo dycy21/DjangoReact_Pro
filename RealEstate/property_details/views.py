@@ -35,8 +35,7 @@ class PropertyViewSet(viewsets.ModelViewSet):
     """
     API endpoint for properties. Simplified for debugging.
     """
-    # queryset = Property.objects.filter(status='active').prefetch_related('images') # More complex
-    queryset = Property.objects.all() # Simplest possible query
+    queryset = Property.objects.all().prefetch_related('images')  # queryset = Property.objects.filter(status='active').prefetch_related('images') # More complex query temporarily disabled
     serializer_class = TempPropertySerializer # Use the temporary serializer
     permission_classes = [IsAuthenticatedOrReadOnly] # Use built-in permission for now
     # filterset_class = PropertyFilter # Temporarily disabled
