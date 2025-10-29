@@ -1,67 +1,76 @@
 import React from 'react';
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from '/src/contexts/AuthContext.jsx';
+import { Routes, Route, Navigate } from 'react-router-dom';
+// Use standard relative paths
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import './index.css'; // Assuming Tailwind setup includes this
 
-// Layout & Components
-import NavBar from '/src/components/NavBar.jsx';
+// Import Components
+import NavBar from './components/NavBar.jsx';
 
-// Pages
-import HomePage from '/src/pages/HomePage.jsx';
-import LoginPage from '/src/pages/LoginPage.jsx';
-import RegisterPage from '/src/pages/RegisterPage.jsx';
-import PropertyDetailsPage from '/src/pages/PropertyDetailsPage.jsx';
-import PropertyForm from '/src/pages/PropertyForm.jsx';
+// Import Pages (using relative paths)
+import HomePage from './pages/HomePage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import PropertyDetailsPage from './pages/PropertyDetailsPage.jsx';
+import PropertyForm from './pages/PropertyForm.jsx'; // Used for both create and edit
 
-// This component ensures a user is logged in to access certain routes
-const ProtectedRoute = () => {
-  const { user } = useAuth();
-  if (!user) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" replace />;
+// Protected Route HOC (Higher Order Component)
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    // Optionally return a loading spinner while auth state is being determined
+    return <div className="flex justify-center items-center h-screen"><div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-indigo-500"></div></div>;
   }
-  return <Outlet />; // Render the child route (e.g., PropertyForm)
-};
 
-// This component includes the Navbar and Footer for all pages
-const MainLayout = () => {
-  return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <NavBar />
-      <main className="flex-grow">
-        <Outlet /> {/* Child routes will render here */}
-      </main>
-      <footer className="bg-gray-800 text-white py-8 mt-16">
-        <div className="container mx-auto px-6 text-center">
-          <p>&copy; 2025 RealEstate. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
+  return user ? children : <Navigate to="/login" replace />;
+}
+
 
 function App() {
+  // NOTE: BrowserRouter wrapper should only be in main.jsx
+
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/property/:propertyId" element={<PropertyDetailsPage />} />
-        
-        {/* Protected Routes (Require Login) */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/property/create" element={<PropertyForm />} />
-          <Route path="/property/edit/:propertyId" element={<PropertyForm />} />
-        </Route>
-        
-        {/* Not Found Route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <> {/* Use Fragment */}
+      <NavBar />
+      <main className="pt-16 font-inter"> {/* Add padding-top */}
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* --- Specific routes MUST come before dynamic routes --- */}
+
+          {/* Protected Routes (Require Login) */}
+          <Route
+            path="/add-property" // Specific path for creating
+            element={
+              <ProtectedRoute>
+                <PropertyForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/property/edit/:id" // Edit route
+            element={
+              <ProtectedRoute>
+                <PropertyForm />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Dynamic route for viewing details - MUST come AFTER specific routes */}
+          <Route path="/property/:id" element={<PropertyDetailsPage />} />
+
+
+          {/* Fallback Route */}
+           <Route path="*" element={<Navigate to="/" replace />} /> {/* Redirect unknown paths to home */}
+        </Routes>
+      </main>
+    </>
   );
 }
 
 export default App;
-
 
