@@ -1,46 +1,73 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext.jsx'; // Use alias for src directory
 
-const NavBar = () => {
+function NavBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login'); // Redirect to login after logout
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Handle logout error (e.g., show a message)
+    }
   };
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold text-blue-600 cursor-pointer">
-          <i className="fas fa-home mr-2"></i>RealEstate
-        </Link>
-        <div className="flex space-x-6 items-center">
-          <Link to="/" className="text-gray-600 hover:text-blue-600 cursor-pointer font-medium">Home</Link>
-          {user ? (
-            <>
-              <Link
-                to="/property/create"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-700 cursor-pointer font-medium"
-              >
-                Create Listing
-              </Link>
-              <a onClick={handleLogout} className="text-gray-600 hover:text-blue-600 cursor-pointer font-medium">
-                Logout ({user.email})
-              </a>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-gray-600 hover:text-blue-600 cursor-pointer font-medium">Login</Link>
-              <Link to="/register" className="bg-blue-100 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-200 cursor-pointer font-medium">Register</Link>
-            </>
-          )}
+    <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-10 font-inter">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex">
+            <Link to="/" className="flex-shrink-0 flex items-center text-xl font-bold text-indigo-600">
+              RealEstatePro
+            </Link>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+              Home
+            </Link>
+            {user ? (
+              <>
+                {/* --- Corrected Link --- */}
+                <Link
+                  to="/add-property" // Ensure this path matches the Route in App.jsx
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Add Property
+                </Link>
+                <span className="text-gray-500 text-sm">Welcome, {user.username || user.email}!</span>
+                <button
+                  onClick={handleLogout}
+                  className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-indigo-600 text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>
   );
-};
+}
 
 export default NavBar;
+

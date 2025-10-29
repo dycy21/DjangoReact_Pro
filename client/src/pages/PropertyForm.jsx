@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// Use absolute paths from src directory
-import apiClient from '/src/api/apiClient.js';
-import Spinner from '/src/components/Spinner.jsx';
-import ErrorMessage from '/src/components/ErrorMessage.jsx';
+// Use standard relative paths
+import apiClient from '../api/apiClient.js';
+import Spinner from '../components/Spinner.jsx';
+import ErrorMessage from '../components/ErrorMessage.jsx';
 // No need to import useAuth here unless specifically needed for validation
 
 function PropertyForm() {
