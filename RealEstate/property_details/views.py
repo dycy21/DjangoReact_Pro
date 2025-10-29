@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .models import Property, PropertyImage # Keep this import
 # from .serializers import PropertySerializer, PropertyImageSerializer # Using TempPropertySerializer for now
-from .permissions import IsOwnerOrReadOnly # Keep this import
+#from .permissions import IsOwnerOrReadOnly # Keep this import
 # from .filters import PropertyFilter # Keep commented out for now
 
 # --- Simplified Serializer (Temporary for Debugging) ---
