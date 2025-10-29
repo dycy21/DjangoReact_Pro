@@ -1,67 +1,83 @@
 import React from 'react';
-import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import { useAuth } from '/src/contexts/AuthContext.jsx';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+// Use relative paths for imports within the src directory
+import { AuthProvider, useAuth } from './contexts/AuthContext.jsx';
+import './index.css';
 
-// Layout & Components
-import NavBar from '/src/components/NavBar.jsx';
+// Import Components and Pages using relative paths
+import NavBar from './components/NavBar.jsx';
+// import ProtectedRoute from './components/ProtectedRoute'; // If needed later
 
-// Pages
-import HomePage from '/src/pages/HomePage.jsx';
-import LoginPage from '/src/pages/LoginPage.jsx';
-import RegisterPage from '/src/pages/RegisterPage.jsx';
-import PropertyDetailsPage from '/src/pages/PropertyDetailsPage.jsx';
-import PropertyForm from '/src/pages/PropertyForm.jsx';
+import HomePage from './pages/HomePage.jsx';
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
+import PropertyDetailsPage from './pages/PropertyDetailsPage.jsx';
+import PropertyForm from './pages/PropertyForm.jsx';
 
-// This component ensures a user is logged in to access certain routes
-const ProtectedRoute = () => {
-  const { user } = useAuth();
-  if (!user) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" replace />;
+// A simple wrapper for routes that require authentication
+function RequireAuth({ children }) {
+  const { auth } = useAuth();
+  // Redirect to login if not authenticated and not currently loading auth state
+  if (!auth.loading && !auth.isAuthenticated) {
+     return <Navigate to="/login" replace />;
   }
-  return <Outlet />; // Render the child route (e.g., PropertyForm)
-};
+  // Optionally show a loading state while auth is loading
+  // if (auth.loading) {
+  //   return <div>Loading...</div>; // Or a spinner
+  // }
+  return children;
+}
 
-// This component includes the Navbar and Footer for all pages
-const MainLayout = () => {
-  return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <NavBar />
-      <main className="flex-grow">
-        <Outlet /> {/* Child routes will render here */}
-      </main>
-      <footer className="bg-gray-800 text-white py-8 mt-16">
-        <div className="container mx-auto px-6 text-center">
-          <p>&copy; 2025 RealEstate. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
 
 function App() {
   return (
-    <Routes>
-      <Route element={<MainLayout />}>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/property/:propertyId" element={<PropertyDetailsPage />} />
-        
-        {/* Protected Routes (Require Login) */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/property/create" element={<PropertyForm />} />
-          <Route path="/property/edit/:propertyId" element={<PropertyForm />} />
-        </Route>
-        
-        {/* Not Found Route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <Router>
+        <div className="flex flex-col min-h-screen bg-gray-50 font-inter"> {/* Changed bg color slightly */}
+          <NavBar />
+          <main className="flex-grow container mx-auto px-4 py-8"> {/* Added container for consistent padding */}
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              {/* Use :id parameter for property details */}
+              <Route path="/property/:id" element={<PropertyDetailsPage />} />
+
+              {/* Protected Routes */}
+              <Route
+                path="/add-property"
+                element={
+                  <RequireAuth>
+                    <PropertyForm />
+                  </RequireAuth>
+                }
+              />
+               {/* --- Add Edit Route --- */}
+               <Route
+                 path="/property/edit/:id"
+                 element={
+                   <RequireAuth>
+                     {/* Reuse PropertyForm for editing */}
+                     <PropertyForm />
+                   </RequireAuth>
+                 }
+               />
+               {/* --- End Edit Route --- */}
+
+              {/* Optional: Add a 404 Not Found Route */}
+              <Route path="*" element={<div className="text-center py-10"><h2 className="text-2xl font-semibold">404 - Page Not Found</h2></div>} />
+            </Routes>
+          </main>
+          {/* Optional Footer */}
+           <footer className="bg-gray-800 text-white p-4 text-center mt-auto"> {/* Ensure footer sticks to bottom */}
+             © 2025 RealEstate Pro
+           </footer>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
 export default App;
-
 
