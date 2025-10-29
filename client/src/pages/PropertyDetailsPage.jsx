@@ -19,7 +19,7 @@ const PropertyDetailsPage = () => {
       setError(null);
       try {
         // Use new endpoint
-        const response = await apiClient.get(`/api/v1/property_details/properties/${propertyId}/`);
+        const response = await apiClient.get(`/api/v1/properties/${propertyId}/`);
         setProperty(response.data);
       } catch (err) {
         console.error("Failed to fetch property:", err);
@@ -35,7 +35,7 @@ const PropertyDetailsPage = () => {
     if (window.confirm("Are you sure you want to delete this listing?")) {
       try {
         // Use new endpoint
-        await apiClient.delete(`/api/v1/property_details/properties/${propertyId}/`);
+        await apiClient.delete(`/api/v1/properties/${propertyId}/`);
         alert("Property deleted successfully.");
         navigate('/');
       } catch (err) {

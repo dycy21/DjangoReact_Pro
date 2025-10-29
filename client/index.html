@@ -2,20 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- 
-      Changed path to be relative.
-    -->
-    <link rel="icon" type="image/svg+xml" href="./vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>React Real Estate</title>
+    <title>Real Estate App</title>
+    <!-- Add Google Font Inter -->
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+     {/* Link to vite.svg removed */}
   </head>
-  <body class="bg-gray-100">
+  <body>
     <div id="root"></div>
-    <!-- 
-      This path is now relative, which allows Vite/Rollup
-      to find it correctly during the build process.
-    -->
-    <script type="module" src="./src/Main.jsx"></script>
+    {/* Use the standard relative path */}
+    <script type="module" src="./src/main.jsx"></script>
   </body>
 </html>
 
